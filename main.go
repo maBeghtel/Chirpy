@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -24,5 +25,6 @@ func main() {
 }
 
 func handleRoot(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello World")
+	tmpl := template.Must(template.ParseFiles("index.html"))
+	tmpl.Execute(w, nil)
 }
