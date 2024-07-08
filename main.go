@@ -1,36 +1,22 @@
 package main
 
 import (
-	"fmt"
-	"html/template"
 	"log"
 	"net/http"
-	"os"
-
-	"github.com/joho/godotenv"
 )
 
 func main() {
+	const filepathRoot = "."
+	const port = "8080"
+
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", handleRoot)
-	mux.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets/"))))
+	mux.Handle("/", http.FileServer(http.Dir(filepathRoot)))
 
-	godotenv.Load()
-	portString := os.Getenv("PORT")
-	if portString == "" {
-		log.Fatal("Port is not found in the environment")
+	srv := &http.Server{
+		Addr:    ":" + port,
+		Handler: mux,
 	}
-	fmt.Println("Server listening to port: 8080")
-	http.ListenAndServe(portString, mux)
 
+	log.Printf("Serving files from %s on port: %s\n", filepathRoot, port)
+	log.Fatal(srv.ListenAndServe())
 }
-
-func handleRoot(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("index.html"))
-	tmpl.Execute(w, nil)
-}
-
-/*func handleAssets(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseGlob("logo.png"))
-	tmpl.Execute(w, nil)
-}*/
